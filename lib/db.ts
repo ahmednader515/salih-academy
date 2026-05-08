@@ -792,6 +792,21 @@ const HOMEPAGE_DEFAULTS: HomepageSetting = {
   heroSliderImage3: null,
   heroSliderImage4: null,
   heroSliderImage5: null,
+  heroSliderImage1Desktop: null,
+  heroSliderImage1Tablet: null,
+  heroSliderImage1Mobile: null,
+  heroSliderImage2Desktop: null,
+  heroSliderImage2Tablet: null,
+  heroSliderImage2Mobile: null,
+  heroSliderImage3Desktop: null,
+  heroSliderImage3Tablet: null,
+  heroSliderImage3Mobile: null,
+  heroSliderImage4Desktop: null,
+  heroSliderImage4Tablet: null,
+  heroSliderImage4Mobile: null,
+  heroSliderImage5Desktop: null,
+  heroSliderImage5Tablet: null,
+  heroSliderImage5Mobile: null,
   heroSliderCourseId1: null,
   heroSliderCourseId2: null,
   heroSliderCourseId3: null,
@@ -1043,6 +1058,21 @@ async function ensureHomepageHeroTemplateColumns(): Promise<void> {
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_3 TEXT`;
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_4 TEXT`;
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_5 TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_1_desktop TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_1_tablet TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_1_mobile TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_2_desktop TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_2_tablet TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_2_mobile TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_3_desktop TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_3_tablet TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_3_mobile TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_4_desktop TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_4_tablet TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_4_mobile TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_5_desktop TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_5_tablet TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_image_5_mobile TEXT`;
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero_slider_interval_ms INTEGER`;
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero3_title TEXT`;
       await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS hero3_subtitle TEXT`;
@@ -1395,6 +1425,12 @@ async function getHomepageSettingsUncached(): Promise<HomepageSetting> {
       row.hero_slider_image_5 != null && String(row.hero_slider_image_5).trim() !== ""
         ? String(row.hero_slider_image_5).trim().slice(0, 4000)
         : null;
+    const readSliderImageVariant = (snake: string, fallback: string | null) => {
+      const v = row[snake];
+      if (v == null) return fallback;
+      const s = String(v).trim();
+      return s.length > 0 ? s.slice(0, 4000) : fallback;
+    };
     const readSliderCourseId = (snake: string) => {
       const v = row[snake];
       if (v == null) return null;
@@ -1526,6 +1562,21 @@ async function getHomepageSettingsUncached(): Promise<HomepageSetting> {
       heroSliderImage3: sliderImage3,
       heroSliderImage4: sliderImage4,
       heroSliderImage5: sliderImage5,
+      heroSliderImage1Desktop: readSliderImageVariant("hero_slider_image_1_desktop", sliderImage1),
+      heroSliderImage1Tablet: readSliderImageVariant("hero_slider_image_1_tablet", sliderImage1),
+      heroSliderImage1Mobile: readSliderImageVariant("hero_slider_image_1_mobile", sliderImage1),
+      heroSliderImage2Desktop: readSliderImageVariant("hero_slider_image_2_desktop", sliderImage2),
+      heroSliderImage2Tablet: readSliderImageVariant("hero_slider_image_2_tablet", sliderImage2),
+      heroSliderImage2Mobile: readSliderImageVariant("hero_slider_image_2_mobile", sliderImage2),
+      heroSliderImage3Desktop: readSliderImageVariant("hero_slider_image_3_desktop", sliderImage3),
+      heroSliderImage3Tablet: readSliderImageVariant("hero_slider_image_3_tablet", sliderImage3),
+      heroSliderImage3Mobile: readSliderImageVariant("hero_slider_image_3_mobile", sliderImage3),
+      heroSliderImage4Desktop: readSliderImageVariant("hero_slider_image_4_desktop", sliderImage4),
+      heroSliderImage4Tablet: readSliderImageVariant("hero_slider_image_4_tablet", sliderImage4),
+      heroSliderImage4Mobile: readSliderImageVariant("hero_slider_image_4_mobile", sliderImage4),
+      heroSliderImage5Desktop: readSliderImageVariant("hero_slider_image_5_desktop", sliderImage5),
+      heroSliderImage5Tablet: readSliderImageVariant("hero_slider_image_5_tablet", sliderImage5),
+      heroSliderImage5Mobile: readSliderImageVariant("hero_slider_image_5_mobile", sliderImage5),
       heroSliderCourseId1: readSliderCourseId("hero_slider_course_id_1"),
       heroSliderCourseId2: readSliderCourseId("hero_slider_course_id_2"),
       heroSliderCourseId3: readSliderCourseId("hero_slider_course_id_3"),
@@ -1922,6 +1973,21 @@ export async function updateHomepageSettings(data: {
   hero_slider_image_3?: string | null;
   hero_slider_image_4?: string | null;
   hero_slider_image_5?: string | null;
+  hero_slider_image_1_desktop?: string | null;
+  hero_slider_image_1_tablet?: string | null;
+  hero_slider_image_1_mobile?: string | null;
+  hero_slider_image_2_desktop?: string | null;
+  hero_slider_image_2_tablet?: string | null;
+  hero_slider_image_2_mobile?: string | null;
+  hero_slider_image_3_desktop?: string | null;
+  hero_slider_image_3_tablet?: string | null;
+  hero_slider_image_3_mobile?: string | null;
+  hero_slider_image_4_desktop?: string | null;
+  hero_slider_image_4_tablet?: string | null;
+  hero_slider_image_4_mobile?: string | null;
+  hero_slider_image_5_desktop?: string | null;
+  hero_slider_image_5_tablet?: string | null;
+  hero_slider_image_5_mobile?: string | null;
   hero_slider_course_id_1?: string | null;
   hero_slider_course_id_2?: string | null;
   hero_slider_course_id_3?: string | null;
@@ -2118,6 +2184,51 @@ export async function updateHomepageSettings(data: {
   }
   if (data.hero_slider_image_5 !== undefined) {
     await sql`UPDATE "HomepageSetting" SET hero_slider_image_5 = ${data.hero_slider_image_5}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_1_desktop !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_1_desktop = ${data.hero_slider_image_1_desktop}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_1_tablet !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_1_tablet = ${data.hero_slider_image_1_tablet}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_1_mobile !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_1_mobile = ${data.hero_slider_image_1_mobile}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_2_desktop !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_2_desktop = ${data.hero_slider_image_2_desktop}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_2_tablet !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_2_tablet = ${data.hero_slider_image_2_tablet}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_2_mobile !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_2_mobile = ${data.hero_slider_image_2_mobile}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_3_desktop !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_3_desktop = ${data.hero_slider_image_3_desktop}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_3_tablet !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_3_tablet = ${data.hero_slider_image_3_tablet}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_3_mobile !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_3_mobile = ${data.hero_slider_image_3_mobile}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_4_desktop !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_4_desktop = ${data.hero_slider_image_4_desktop}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_4_tablet !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_4_tablet = ${data.hero_slider_image_4_tablet}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_4_mobile !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_4_mobile = ${data.hero_slider_image_4_mobile}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_5_desktop !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_5_desktop = ${data.hero_slider_image_5_desktop}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_5_tablet !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_5_tablet = ${data.hero_slider_image_5_tablet}, updated_at = NOW() WHERE id = 'default'`;
+  }
+  if (data.hero_slider_image_5_mobile !== undefined) {
+    await sql`UPDATE "HomepageSetting" SET hero_slider_image_5_mobile = ${data.hero_slider_image_5_mobile}, updated_at = NOW() WHERE id = 'default'`;
   }
   if (data.hero_slider_course_id_1 !== undefined) {
     await sql`UPDATE "HomepageSetting" SET hero_slider_course_id_1 = ${data.hero_slider_course_id_1}, updated_at = NOW() WHERE id = 'default'`;

@@ -147,6 +147,22 @@ export interface HomepageSetting {
   heroSliderImage3?: string | null;
   heroSliderImage4?: string | null;
   heroSliderImage5?: string | null;
+  /** صور قالب السلايدر حسب الجهاز (جديد) — عند عدم وجودها نستخدم heroSliderImageN كبديل */
+  heroSliderImage1Desktop?: string | null;
+  heroSliderImage1Tablet?: string | null;
+  heroSliderImage1Mobile?: string | null;
+  heroSliderImage2Desktop?: string | null;
+  heroSliderImage2Tablet?: string | null;
+  heroSliderImage2Mobile?: string | null;
+  heroSliderImage3Desktop?: string | null;
+  heroSliderImage3Tablet?: string | null;
+  heroSliderImage3Mobile?: string | null;
+  heroSliderImage4Desktop?: string | null;
+  heroSliderImage4Tablet?: string | null;
+  heroSliderImage4Mobile?: string | null;
+  heroSliderImage5Desktop?: string | null;
+  heroSliderImage5Tablet?: string | null;
+  heroSliderImage5Mobile?: string | null;
   /** ربط كل شريحة سلايدر بكورس منشور (معرف الكورس) */
   heroSliderCourseId1?: string | null;
   heroSliderCourseId2?: string | null;

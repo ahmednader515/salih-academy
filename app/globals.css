@@ -339,6 +339,54 @@ html.dark .hero-wave-fill {
   }
 }
 
+/* Watermark that travels across the video player */
+@keyframes video-watermark-travel {
+  0% {
+    left: 6%;
+    top: 12%;
+    opacity: 1;
+  }
+  /* reach edge, then teleport */
+  24% {
+    left: 88%;
+    top: 10%;
+    opacity: 1;
+  }
+  /* fade out fully, teleport while hidden, then fade back in */
+  24.8% { opacity: 0; }
+  25.0% { left: 88%; top: 10%; opacity: 0; }
+  25.1% { left: 8%; top: 86%; opacity: 0; }
+  26.0% { opacity: 0; }
+  26.2% { opacity: 1; }
+  50% {
+    left: 82%;
+    top: 86%;
+    opacity: 1;
+  }
+  /* reach edge, then teleport */
+  74% {
+    left: 8%;
+    top: 78%;
+    opacity: 1;
+  }
+  /* fade out fully, teleport while hidden, then fade back in */
+  74.8% { opacity: 0; }
+  75.0% { left: 8%; top: 78%; opacity: 0; }
+  75.1% { left: 90%; top: 18%; opacity: 0; }
+  76.0% { opacity: 0; }
+  76.2% { opacity: 1; }
+  100% {
+    left: 6%;
+    top: 12%;
+    opacity: 1;
+  }
+}
+
+.video-watermark-float {
+  /* legacy class: watermark motion is now JS-driven */
+  max-width: min(92%, 18rem);
+}
+
 /* قسم «اختر المدرسين» في الرئيسية: تدرج يبدأ بلون الهيدر/السطح — بدون border يُظهر خطاً فاصلاً */
 .home-teachers-hero-blend {
   background: linear-gradient(

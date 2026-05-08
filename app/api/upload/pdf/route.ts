@@ -4,7 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { uploadToR2, isR2Configured, getMissingR2EnvVars } from "@/lib/r2";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-const ALLOWED_TYPE = "application/pdf";
+
+function sanitizeExt(name: string): string {
+  const raw = name.split(".").pop()?.toLowerCase() ?? "";
+  const ext = raw.replace(/[^a-z0-9]+/g, "").slice(0, 10);
+  return ext || "bin";
+}
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -38,13 +43,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "لم يُرفع أي ملف" }, { status: 400 });
   }
 
-  if (file.type !== ALLOWED_TYPE) {
-    return NextResponse.json(
-      { error: "نوع الملف غير مدعوم. استخدم ملف PDF فقط." },
-      { status: 400 }
-    );
-  }
-
   if (file.size > MAX_SIZE) {
     return NextResponse.json(
       { error: "حجم الملف أكبر من 10 ميجابايت" },
@@ -52,13 +50,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
-  const safeExt = ext === "pdf" ? "pdf" : "pdf";
-  const key = `pdfs/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${safeExt}`;
+  const ext = sanitizeExt(file.name || "");
+  const key = `lesson-files/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { url: uploadedUrl } = await uploadToR2(buffer, key, file.type);
+    const contentType = (file.type && file.type.trim()) ? file.type : "application/octet-stream";
+    const { url: uploadedUrl } = await uploadToR2(buffer, key, contentType);
 
     const baseUrl = (uploadedUrl ? null : process.env.R2_PUBLIC_URL?.trim()?.replace(/\/$/, "")) || null;
     const url = uploadedUrl || (baseUrl ? `${baseUrl}/${key}` : null);
@@ -72,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url, key });
   } catch (e) {
-    console.error("R2 PDF upload error:", e);
+    console.error("R2 file upload error:", e);
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "فشل رفع الملف" },
       { status: 500 }

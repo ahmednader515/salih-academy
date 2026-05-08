@@ -1,6 +1,7 @@
 /** UI strings for dashboard homepage settings form (English). Nested under dashboard.homepageSettingsForm in en.ts */
 export const homepageSettingsFormUiEn = {
   uploading: "Uploading…",
+  upload: "Upload",
   uploadFailed: "Upload failed",
   connectionFailed: "Connection failed",
   delete: "Delete",
@@ -42,6 +43,9 @@ export const homepageSettingsFormUiEn = {
   sliderImageN: "Slider image {n}",
   sliderPreviewN: "Slider image {n} preview",
   sliderUrlPh: "Image URL or upload below",
+  sliderDesktop: "Desktop",
+  sliderTablet: "Tablet",
+  sliderMobile: "Mobile",
   uploadN: "Upload {n}",
   linkPublishedCourse: "Link click to a published course",
   noCourseLink: "— No link —",

@@ -1,6 +1,7 @@
 /** UI strings for dashboard homepage settings form (Arabic). Nested under dashboard.homepageSettingsForm in ar.ts */
 export const homepageSettingsFormUiAr = {
   uploading: "جاري الرفع...",
+  upload: "رفع",
   uploadFailed: "فشل الرفع",
   connectionFailed: "فشل الاتصال",
   delete: "حذف",
@@ -43,6 +44,9 @@ export const homepageSettingsFormUiAr = {
   sliderImageN: "صورة السلايدر {n}",
   sliderPreviewN: "معاينة صورة السلايدر {n}",
   sliderUrlPh: "رابط الصورة أو ارفع من الزر",
+  sliderDesktop: "كمبيوتر",
+  sliderTablet: "تابلت",
+  sliderMobile: "موبايل",
   uploadN: "رفع {n}",
   linkPublishedCourse: "ربط بالضغط على الصورة (كورس منشور)",
   noCourseLink: "— بدون ربط —",

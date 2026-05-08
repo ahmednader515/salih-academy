@@ -175,7 +175,7 @@ export default async function LessonPage({ params }: Props) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-btn)] bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)]"
               >
-                📄 {t("courses.downloadPdf", "Download / View PDF")}
+                📎 {t("courses.downloadPdf", "Download / View file")}
               </a>
             </div>
           ) : null}

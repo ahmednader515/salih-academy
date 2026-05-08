@@ -39,11 +39,36 @@ export default async function HomePage() {
         : "classic";
 
   const heroSliderSlots = [
-    { src: homepageSettings.heroSliderImage1, courseId: homepageSettings.heroSliderCourseId1 ?? null },
-    { src: homepageSettings.heroSliderImage2, courseId: homepageSettings.heroSliderCourseId2 ?? null },
-    { src: homepageSettings.heroSliderImage3, courseId: homepageSettings.heroSliderCourseId3 ?? null },
-    { src: homepageSettings.heroSliderImage4, courseId: homepageSettings.heroSliderCourseId4 ?? null },
-    { src: homepageSettings.heroSliderImage5, courseId: homepageSettings.heroSliderCourseId5 ?? null },
+    {
+      desktop: homepageSettings.heroSliderImage1Desktop ?? homepageSettings.heroSliderImage1 ?? null,
+      tablet: homepageSettings.heroSliderImage1Tablet ?? homepageSettings.heroSliderImage1 ?? null,
+      mobile: homepageSettings.heroSliderImage1Mobile ?? homepageSettings.heroSliderImage1 ?? null,
+      courseId: homepageSettings.heroSliderCourseId1 ?? null,
+    },
+    {
+      desktop: homepageSettings.heroSliderImage2Desktop ?? homepageSettings.heroSliderImage2 ?? null,
+      tablet: homepageSettings.heroSliderImage2Tablet ?? homepageSettings.heroSliderImage2 ?? null,
+      mobile: homepageSettings.heroSliderImage2Mobile ?? homepageSettings.heroSliderImage2 ?? null,
+      courseId: homepageSettings.heroSliderCourseId2 ?? null,
+    },
+    {
+      desktop: homepageSettings.heroSliderImage3Desktop ?? homepageSettings.heroSliderImage3 ?? null,
+      tablet: homepageSettings.heroSliderImage3Tablet ?? homepageSettings.heroSliderImage3 ?? null,
+      mobile: homepageSettings.heroSliderImage3Mobile ?? homepageSettings.heroSliderImage3 ?? null,
+      courseId: homepageSettings.heroSliderCourseId3 ?? null,
+    },
+    {
+      desktop: homepageSettings.heroSliderImage4Desktop ?? homepageSettings.heroSliderImage4 ?? null,
+      tablet: homepageSettings.heroSliderImage4Tablet ?? homepageSettings.heroSliderImage4 ?? null,
+      mobile: homepageSettings.heroSliderImage4Mobile ?? homepageSettings.heroSliderImage4 ?? null,
+      courseId: homepageSettings.heroSliderCourseId4 ?? null,
+    },
+    {
+      desktop: homepageSettings.heroSliderImage5Desktop ?? homepageSettings.heroSliderImage5 ?? null,
+      tablet: homepageSettings.heroSliderImage5Tablet ?? homepageSettings.heroSliderImage5 ?? null,
+      mobile: homepageSettings.heroSliderImage5Mobile ?? homepageSettings.heroSliderImage5 ?? null,
+      courseId: homepageSettings.heroSliderCourseId5 ?? null,
+    },
   ];
   const sliderCourseIds = heroSliderSlots
     .map((s) => (s.courseId ? String(s.courseId).trim() : ""))
@@ -58,14 +83,22 @@ export default async function HomePage() {
   }
   const heroSliderSlides = heroSliderSlots
     .map((slot) => {
-      const src = slot.src ? String(slot.src).trim() : "";
-      if (!src) return null;
+      const desktop = slot.desktop ? String(slot.desktop).trim() : "";
+      const tablet = slot.tablet ? String(slot.tablet).trim() : "";
+      const mobile = slot.mobile ? String(slot.mobile).trim() : "";
+      const fallback = desktop || tablet || mobile;
+      if (!fallback) return null;
       const cid = slot.courseId ? String(slot.courseId).trim() : "";
       const slug = cid ? sliderCourseSlugMap.get(cid) : undefined;
       const href = slug ? `/courses/${slug}` : null;
-      return { src, href };
+      return {
+        desktop: desktop || fallback,
+        tablet: tablet || fallback,
+        mobile: mobile || fallback,
+        href,
+      };
     })
-    .filter((s): s is { src: string; href: string | null } => s != null);
+    .filter((s): s is { desktop: string; tablet: string; mobile: string; href: string | null } => s != null);
 
   const heroSliderIntervalMs =
     typeof homepageSettings.heroSliderIntervalMs === "number"
@@ -73,8 +106,8 @@ export default async function HomePage() {
       : 5000;
   const heroTextAlignClass = locale === "en" ? "text-left" : "text-right";
 
-  if (heroTemplate === "image_slider" && heroSliderSlides[0]?.src) {
-    preload(heroSliderSlides[0].src, { as: "image" });
+  if (heroTemplate === "image_slider" && heroSliderSlides[0]?.desktop) {
+    preload(heroSliderSlides[0].desktop, { as: "image" });
   } else if (heroTemplate === "classic") {
     const teacherSrc = homepageSettings.teacherImageUrl?.trim() || "/instructor.png";
     preload(teacherSrc, { as: "image" });

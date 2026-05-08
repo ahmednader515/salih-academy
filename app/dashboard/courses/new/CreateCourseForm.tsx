@@ -539,7 +539,7 @@ export function CreateCourseForm() {
                     {pdfUploading === i ? t(`${Cf}.uploadingPdf`) : t(`${Cf}.choosePdfUpload`)}
                     <input
                       type="file"
-                      accept="application/pdf"
+                      accept="*/*"
                       className="hidden"
                       disabled={pdfUploading !== null}
                       onChange={(async (e) => {

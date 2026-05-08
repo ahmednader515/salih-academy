@@ -68,41 +68,101 @@ type Props = {
   copyrightOverlayStyle?: "floating" | "watermark";
 };
 
+function randBetween(min: number, max: number): number {
+  return min + Math.random() * (max - min);
+}
+
+function useRandomWatermarkMotion(opts?: {
+  /** seconds between teleports (randomized slightly) */
+  minHopMs?: number;
+  maxHopMs?: number;
+  /** how long to fade out/in */
+  fadeMs?: number;
+  /** keep within these % bounds of the player */
+  minPct?: number;
+  maxPct?: number;
+}) {
+  const {
+    minHopMs = 6500,
+    maxHopMs = 9500,
+    fadeMs = 450,
+    minPct = 6,
+    maxPct = 94,
+  } = opts ?? {};
+
+  const [pos, setPos] = useState<{ leftPct: number; topPct: number; opacity: number }>(() => ({
+    leftPct: randBetween(minPct, maxPct),
+    topPct: randBetween(minPct, maxPct),
+    opacity: 1,
+  }));
+
+  const timers = useRef<{ hop?: ReturnType<typeof setTimeout>; fade?: ReturnType<typeof setTimeout> }>({});
+
+  useEffect(() => {
+    const scheduleHop = () => {
+      const delay = Math.round(randBetween(minHopMs, maxHopMs));
+      timers.current.hop = setTimeout(() => {
+        // fade out
+        setPos((p) => ({ ...p, opacity: 0 }));
+        // teleport while hidden, then fade in
+        timers.current.fade = setTimeout(() => {
+          setPos({
+            leftPct: randBetween(minPct, maxPct),
+            topPct: randBetween(minPct, maxPct),
+            opacity: 1,
+          });
+          scheduleHop();
+        }, fadeMs);
+      }, delay);
+    };
+
+    scheduleHop();
+    return () => {
+      if (timers.current.hop) clearTimeout(timers.current.hop);
+      if (timers.current.fade) clearTimeout(timers.current.fade);
+    };
+  }, [fadeMs, maxHopMs, maxPct, minHopMs, minPct]);
+
+  return {
+    style: {
+      left: `${pos.leftPct}%`,
+      top: `${pos.topPct}%`,
+      opacity: pos.opacity,
+      transform: "translate(-50%, -50%)",
+      transition: `left 6.5s linear, top 6.5s linear, opacity ${fadeMs}ms linear`,
+      willChange: "left, top, opacity",
+    } as React.CSSProperties,
+  };
+}
+
 /** علامة مائية صغيرة تتنقل على المشغّل (تقليل فعالية حذفها من تسجيل شاشة ثابت) */
 function VideoCopyrightFloatingBadge({ code, label, dir }: { code: string; label: string; dir: "rtl" | "ltr" }) {
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 60_000);
-    return () => clearInterval(id);
-  }, []);
-  const positions = [
-    "right-3 top-3",
-    "left-3 bottom-16",
-    "left-3 top-10",
-    "right-3 bottom-20",
-    "left-1/2 top-4 -translate-x-1/2",
-    "right-1/2 bottom-14 translate-x-1/2",
-  ];
-  const pos = positions[tick % positions.length];
+  const { style } = useRandomWatermarkMotion();
   return (
     <div
-      className={`pointer-events-none absolute z-[25] max-w-[min(90%,14rem)] select-none rounded-md border border-white/25 bg-black/60 px-2 py-1.5 text-[10px] font-semibold text-white/95 shadow-lg backdrop-blur-sm sm:text-[11px] ${pos}`}
+      className="pointer-events-none absolute z-[25] select-none whitespace-nowrap rounded-full border border-white/15 bg-black/25 px-2 py-1 text-[9px] font-semibold text-white/85 shadow-sm backdrop-blur-[2px] sm:text-[10px]"
+      style={style}
       dir={dir}
       aria-hidden
     >
-      <div className="text-[9px] font-normal text-white/75">{label}</div>
-      <div className="font-mono tracking-widest">{code}</div>
+      <div className="flex items-center gap-2">
+        <span className="text-[8px] font-normal text-white/65 sm:text-[9px]">{label}</span>
+        <span className="font-mono tracking-[0.25em]">{code}</span>
+      </div>
     </div>
   );
 }
 
 /** علامة مائية ثابتة كبيرة في منتصف الفيديو */
 function VideoCopyrightCenterWatermark({ code }: { code: string }) {
+  const { style } = useRandomWatermarkMotion();
   return (
-    <div className="pointer-events-none absolute inset-0 z-[25] flex items-center justify-center overflow-hidden select-none px-4" aria-hidden>
-      <div className="-rotate-[20deg] text-center font-mono font-bold uppercase tracking-[0.22em] text-white/15 [text-shadow:0_1px_2px_rgba(0,0,0,0.45)] [font-size:clamp(1.4rem,6vw,4.5rem)]">
-        {code}
-      </div>
+    <div
+      className="pointer-events-none absolute z-[25] select-none whitespace-nowrap rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-semibold text-white/70 shadow-sm backdrop-blur-[2px] sm:text-[10px]"
+      style={style}
+      aria-hidden
+    >
+      <span className="font-mono tracking-[0.28em]">{code}</span>
     </div>
   );
 }
@@ -129,6 +189,7 @@ export function YouTubeOverlayPlayer({
 
   const [ready, setReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playerState, setPlayerState] = useState<number>(-1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
@@ -330,6 +391,7 @@ export function YouTubeOverlayPlayer({
           },
           onStateChange(ev: { data: number }) {
             const state = ev.data;
+            setPlayerState(state);
             if (state === YT_PLAYING) {
               setIsPlaying(true);
               setShowControls(true);
@@ -397,6 +459,7 @@ export function YouTubeOverlayPlayer({
       playerRef.current = null;
       setReady(false);
       setIsPlaying(false);
+      setPlayerState(-1);
       setCurrentTime(0);
       setDuration(0);
       setQualityApplying(false);
@@ -567,7 +630,7 @@ export function YouTubeOverlayPlayer({
         </div>
       ) : null}
       {/* طبقة سوداء سفلية عند الإيقاف لإخفاء اقتراحات يوتيوب الخلفية */}
-      {!isPlaying && (
+      {playerState === YT_ENDED && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-1/2 bg-black" />
       )}
       {/* طبقة علوية للتحكم — لا تغطي شريط الأدوات */}

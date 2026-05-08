@@ -38,11 +38,21 @@ const HERO_BG_PRESET_IDS: HeroBgPreset[] = [
 
 type HeroTemplate = "classic" | "image_slider" | "coming_soon";
 type SliderImageKey =
-  | "heroSliderImage1"
-  | "heroSliderImage2"
-  | "heroSliderImage3"
-  | "heroSliderImage4"
-  | "heroSliderImage5";
+  | "heroSliderImage1Desktop"
+  | "heroSliderImage1Tablet"
+  | "heroSliderImage1Mobile"
+  | "heroSliderImage2Desktop"
+  | "heroSliderImage2Tablet"
+  | "heroSliderImage2Mobile"
+  | "heroSliderImage3Desktop"
+  | "heroSliderImage3Tablet"
+  | "heroSliderImage3Mobile"
+  | "heroSliderImage4Desktop"
+  | "heroSliderImage4Tablet"
+  | "heroSliderImage4Mobile"
+  | "heroSliderImage5Desktop"
+  | "heroSliderImage5Tablet"
+  | "heroSliderImage5Mobile";
 type SliderCourseIdKey =
   | "heroSliderCourseId1"
   | "heroSliderCourseId2"
@@ -59,14 +69,16 @@ type PublishedCourseOption = {
 
 const SLIDER_IMAGE_FIELDS: Array<{
   idx: 1 | 2 | 3 | 4 | 5;
-  key: SliderImageKey;
+  desktopKey: SliderImageKey;
+  tabletKey: SliderImageKey;
+  mobileKey: SliderImageKey;
   courseIdKey: SliderCourseIdKey;
 }> = [
-  { idx: 1, key: "heroSliderImage1", courseIdKey: "heroSliderCourseId1" },
-  { idx: 2, key: "heroSliderImage2", courseIdKey: "heroSliderCourseId2" },
-  { idx: 3, key: "heroSliderImage3", courseIdKey: "heroSliderCourseId3" },
-  { idx: 4, key: "heroSliderImage4", courseIdKey: "heroSliderCourseId4" },
-  { idx: 5, key: "heroSliderImage5", courseIdKey: "heroSliderCourseId5" },
+  { idx: 1, desktopKey: "heroSliderImage1Desktop", tabletKey: "heroSliderImage1Tablet", mobileKey: "heroSliderImage1Mobile", courseIdKey: "heroSliderCourseId1" },
+  { idx: 2, desktopKey: "heroSliderImage2Desktop", tabletKey: "heroSliderImage2Tablet", mobileKey: "heroSliderImage2Mobile", courseIdKey: "heroSliderCourseId2" },
+  { idx: 3, desktopKey: "heroSliderImage3Desktop", tabletKey: "heroSliderImage3Tablet", mobileKey: "heroSliderImage3Mobile", courseIdKey: "heroSliderCourseId3" },
+  { idx: 4, desktopKey: "heroSliderImage4Desktop", tabletKey: "heroSliderImage4Tablet", mobileKey: "heroSliderImage4Mobile", courseIdKey: "heroSliderCourseId4" },
+  { idx: 5, desktopKey: "heroSliderImage5Desktop", tabletKey: "heroSliderImage5Tablet", mobileKey: "heroSliderImage5Mobile", courseIdKey: "heroSliderCourseId5" },
 ];
 
 function initialHeroBgCustom(settings: HomepageSetting): {
@@ -155,11 +167,21 @@ export function HomepageSettingsForm({
     heroFloatImage1: initialSettings.heroFloatImage1 ?? "",
     heroFloatImage2: initialSettings.heroFloatImage2 ?? "",
     heroFloatImage3: initialSettings.heroFloatImage3 ?? "",
-    heroSliderImage1: initialSettings.heroSliderImage1 ?? "",
-    heroSliderImage2: initialSettings.heroSliderImage2 ?? "",
-    heroSliderImage3: initialSettings.heroSliderImage3 ?? "",
-    heroSliderImage4: initialSettings.heroSliderImage4 ?? "",
-    heroSliderImage5: initialSettings.heroSliderImage5 ?? "",
+    heroSliderImage1Desktop: initialSettings.heroSliderImage1Desktop ?? initialSettings.heroSliderImage1 ?? "",
+    heroSliderImage1Tablet: initialSettings.heroSliderImage1Tablet ?? initialSettings.heroSliderImage1 ?? "",
+    heroSliderImage1Mobile: initialSettings.heroSliderImage1Mobile ?? initialSettings.heroSliderImage1 ?? "",
+    heroSliderImage2Desktop: initialSettings.heroSliderImage2Desktop ?? initialSettings.heroSliderImage2 ?? "",
+    heroSliderImage2Tablet: initialSettings.heroSliderImage2Tablet ?? initialSettings.heroSliderImage2 ?? "",
+    heroSliderImage2Mobile: initialSettings.heroSliderImage2Mobile ?? initialSettings.heroSliderImage2 ?? "",
+    heroSliderImage3Desktop: initialSettings.heroSliderImage3Desktop ?? initialSettings.heroSliderImage3 ?? "",
+    heroSliderImage3Tablet: initialSettings.heroSliderImage3Tablet ?? initialSettings.heroSliderImage3 ?? "",
+    heroSliderImage3Mobile: initialSettings.heroSliderImage3Mobile ?? initialSettings.heroSliderImage3 ?? "",
+    heroSliderImage4Desktop: initialSettings.heroSliderImage4Desktop ?? initialSettings.heroSliderImage4 ?? "",
+    heroSliderImage4Tablet: initialSettings.heroSliderImage4Tablet ?? initialSettings.heroSliderImage4 ?? "",
+    heroSliderImage4Mobile: initialSettings.heroSliderImage4Mobile ?? initialSettings.heroSliderImage4 ?? "",
+    heroSliderImage5Desktop: initialSettings.heroSliderImage5Desktop ?? initialSettings.heroSliderImage5 ?? "",
+    heroSliderImage5Tablet: initialSettings.heroSliderImage5Tablet ?? initialSettings.heroSliderImage5 ?? "",
+    heroSliderImage5Mobile: initialSettings.heroSliderImage5Mobile ?? initialSettings.heroSliderImage5 ?? "",
     heroSliderCourseId1: initialSettings.heroSliderCourseId1 ?? "",
     heroSliderCourseId2: initialSettings.heroSliderCourseId2 ?? "",
     heroSliderCourseId3: initialSettings.heroSliderCourseId3 ?? "",
@@ -211,7 +233,9 @@ export function HomepageSettingsForm({
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoUploadError, setLogoUploadError] = useState("");
   const [floatImageUploading, setFloatImageUploading] = useState<1 | 2 | 3 | null>(null);
-  const [sliderImageUploading, setSliderImageUploading] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
+  const [sliderImageUploading, setSliderImageUploading] = useState<
+    `${1 | 2 | 3 | 4 | 5}-${"desktop" | "tablet" | "mobile"}` | null
+  >(null);
   const [hero3Uploading, setHero3Uploading] = useState<"phone" | "badge1" | "badge2" | null>(null);
   const [platformItemUploading, setPlatformItemUploading] = useState<string | null>(null);
   const [platformDetailsItems, setPlatformDetailsItems] = useState<PlatformDetailsItem[]>(
@@ -386,11 +410,21 @@ export function HomepageSettingsForm({
           heroFloatImage1: form.heroFloatImage1.trim() || null,
           heroFloatImage2: form.heroFloatImage2.trim() || null,
           heroFloatImage3: form.heroFloatImage3.trim() || null,
-          heroSliderImage1: form.heroSliderImage1.trim() || null,
-          heroSliderImage2: form.heroSliderImage2.trim() || null,
-          heroSliderImage3: form.heroSliderImage3.trim() || null,
-          heroSliderImage4: form.heroSliderImage4.trim() || null,
-          heroSliderImage5: form.heroSliderImage5.trim() || null,
+          heroSliderImage1Desktop: form.heroSliderImage1Desktop.trim() || null,
+          heroSliderImage1Tablet: form.heroSliderImage1Tablet.trim() || null,
+          heroSliderImage1Mobile: form.heroSliderImage1Mobile.trim() || null,
+          heroSliderImage2Desktop: form.heroSliderImage2Desktop.trim() || null,
+          heroSliderImage2Tablet: form.heroSliderImage2Tablet.trim() || null,
+          heroSliderImage2Mobile: form.heroSliderImage2Mobile.trim() || null,
+          heroSliderImage3Desktop: form.heroSliderImage3Desktop.trim() || null,
+          heroSliderImage3Tablet: form.heroSliderImage3Tablet.trim() || null,
+          heroSliderImage3Mobile: form.heroSliderImage3Mobile.trim() || null,
+          heroSliderImage4Desktop: form.heroSliderImage4Desktop.trim() || null,
+          heroSliderImage4Tablet: form.heroSliderImage4Tablet.trim() || null,
+          heroSliderImage4Mobile: form.heroSliderImage4Mobile.trim() || null,
+          heroSliderImage5Desktop: form.heroSliderImage5Desktop.trim() || null,
+          heroSliderImage5Tablet: form.heroSliderImage5Tablet.trim() || null,
+          heroSliderImage5Mobile: form.heroSliderImage5Mobile.trim() || null,
           heroSliderCourseId1: form.heroSliderCourseId1.trim() || null,
           heroSliderCourseId2: form.heroSliderCourseId2.trim() || null,
           heroSliderCourseId3: form.heroSliderCourseId3.trim() || null,
@@ -764,55 +798,72 @@ export function HomepageSettingsForm({
                 className="mt-1 w-full rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
               />
             </div>
-            {SLIDER_IMAGE_FIELDS.map(({ idx, key, courseIdKey }) => {
-              const current = form[key];
+            {SLIDER_IMAGE_FIELDS.map(({ idx, desktopKey, tabletKey, mobileKey, courseIdKey }) => {
               const courseIdValue = form[courseIdKey];
+              const variants: Array<{ label: string; key: SliderImageKey; variant: "desktop" | "tablet" | "mobile" }> = [
+                { label: fh("sliderDesktop"), key: desktopKey, variant: "desktop" },
+                { label: fh("sliderTablet"), key: tabletKey, variant: "tablet" },
+                { label: fh("sliderMobile"), key: mobileKey, variant: "mobile" },
+              ];
               return (
                 <div key={idx}>
                   <label className="block text-sm font-medium text-[var(--color-foreground)]">
                     {fillMessage(fh("sliderImageN"), { n: idx })}
                   </label>
-                  <div className="mt-1 flex flex-wrap items-center gap-2">
-                    {current ? (
-                      <img
-                        src={current}
-                        alt={fillMessage(fh("sliderPreviewN"), { n: idx })}
-                        className="h-12 w-16 rounded border border-[var(--color-border)] object-cover"
-                      />
-                    ) : null}
-                    <input
-                      type="text"
-                      value={current}
-                      onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                      placeholder={fh("sliderUrlPh")}
-                      className="min-w-[180px] flex-1 rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
-                    />
-                    <label className="shrink-0 cursor-pointer rounded-[var(--radius-btn)] border border-[var(--color-primary)] bg-[var(--color-primary)]/10 px-3 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/20 disabled:opacity-50">
-                      {sliderImageUploading === idx ? fh("uploading") : fillMessage(fh("uploadN"), { n: idx })}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif"
-                        className="hidden"
-                        disabled={sliderImageUploading !== null}
-                        onChange={async (e) => {
-                          const f = e.target.files?.[0];
-                          if (!f) return;
-                          setSliderImageUploading(idx as 1 | 2 | 3 | 4 | 5);
-                          try {
-                            const fd = new FormData();
-                            fd.set("file", f);
-                            const res = await fetch("/api/upload/image", { method: "POST", body: fd });
-                            const data = await res.json().catch(() => ({}));
-                            if (res.ok && data.url) {
-                              setForm((prev) => ({ ...prev, [key]: data.url }));
-                            }
-                          } finally {
-                            setSliderImageUploading(null);
-                            e.target.value = "";
-                          }
-                        }}
-                      />
-                    </label>
+                  <div className="mt-1 space-y-2">
+                    {variants.map(({ label, key, variant }) => {
+                      const current = form[key] as string;
+                      const uploadKey = `${idx}-${variant}` as const;
+                      return (
+                        <div key={variant}>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="min-w-[4.5rem] text-xs font-semibold text-[var(--color-muted)]">
+                              {label}
+                            </span>
+                            {current ? (
+                              <img
+                                src={current}
+                                alt={`${fillMessage(fh("sliderPreviewN"), { n: idx })} (${label})`}
+                                className="h-12 w-16 rounded border border-[var(--color-border)] object-cover"
+                              />
+                            ) : null}
+                            <input
+                              type="text"
+                              value={current}
+                              onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                              placeholder={fh("sliderUrlPh")}
+                              className="min-w-[180px] flex-1 rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+                            />
+                            <label className="shrink-0 cursor-pointer rounded-[var(--radius-btn)] border border-[var(--color-primary)] bg-[var(--color-primary)]/10 px-3 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/20 disabled:opacity-50">
+                              {sliderImageUploading === uploadKey ? fh("uploading") : fh("upload")}
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                className="hidden"
+                                disabled={sliderImageUploading !== null}
+                                onChange={async (e) => {
+                                  const f = e.target.files?.[0];
+                                  if (!f) return;
+                                  setSliderImageUploading(uploadKey);
+                                  try {
+                                    const fd = new FormData();
+                                    fd.set("file", f);
+                                    const res = await fetch("/api/upload/image", { method: "POST", body: fd });
+                                    const data = await res.json().catch(() => ({}));
+                                    if (res.ok && data.url) {
+                                      setForm((prev) => ({ ...prev, [key]: data.url }));
+                                    }
+                                  } finally {
+                                    setSliderImageUploading(null);
+                                    e.target.value = "";
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                   <label className="mt-2 block text-sm font-medium text-[var(--color-foreground)]">
                     {fh("linkPublishedCourse")}

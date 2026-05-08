@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-export type HomeHeroSlide = { src: string; href: string | null };
+export type HomeHeroSlide = { desktop: string; tablet: string; mobile: string; href: string | null };
 
 export function HomeHeroImageSlider({
   slides,
@@ -17,10 +17,21 @@ export function HomeHeroImageSlider({
     () =>
       slides
         .map((s) => ({
-          src: String(s.src).trim(),
+          desktop: String(s.desktop).trim(),
+          tablet: String(s.tablet).trim(),
+          mobile: String(s.mobile).trim(),
           href: s.href && String(s.href).trim() ? String(s.href).trim() : null,
         }))
-        .filter((s) => Boolean(s.src)),
+        .filter((s) => Boolean(s.desktop || s.tablet || s.mobile))
+        .map((s) => {
+          const fallback = s.desktop || s.tablet || s.mobile;
+          return {
+            desktop: s.desktop || fallback,
+            tablet: s.tablet || fallback,
+            mobile: s.mobile || fallback,
+            href: s.href,
+          };
+        }),
     [slides],
   );
   const [active, setActive] = useState(0);
@@ -55,22 +66,48 @@ export function HomeHeroImageSlider({
         <div className="relative h-[calc(100vh-3.5rem)] w-full">
           {safeSlides.map((slide, idx) => {
             const isLcpCandidate = idx === 0;
+            const visibility = `absolute inset-0 z-0 object-cover transition-opacity duration-700 ease-in-out ${
+              idx === active ? "opacity-100" : "opacity-0"
+            }`;
             return (
-              <Image
-                key={slide.src + idx}
-                src={slide.src}
-                alt={`صورة الهيرو ${idx + 1}`}
-                fill
-                sizes="100vw"
-                priority={isLcpCandidate}
-                fetchPriority={isLcpCandidate ? "high" : "low"}
-                {...(!isLcpCandidate ? { loading: "lazy" as const } : {})}
-                quality={isLcpCandidate ? 72 : 65}
-                className={`absolute inset-0 z-0 object-cover transition-opacity duration-700 ease-in-out ${
-                  idx === active ? "opacity-100" : "opacity-0"
-                }`}
-                aria-hidden={idx !== active}
-              />
+              <div key={`${slide.desktop}|${slide.tablet}|${slide.mobile}|${idx}`} aria-hidden={idx !== active}>
+                {/* Mobile */}
+                <Image
+                  src={slide.mobile}
+                  alt={`صورة الهيرو ${idx + 1}`}
+                  fill
+                  sizes="100vw"
+                  priority={isLcpCandidate}
+                  fetchPriority={isLcpCandidate ? "high" : "low"}
+                  {...(!isLcpCandidate ? { loading: "lazy" as const } : {})}
+                  quality={isLcpCandidate ? 72 : 65}
+                  className={`${visibility} block sm:hidden`}
+                />
+                {/* Tablet */}
+                <Image
+                  src={slide.tablet}
+                  alt={`صورة الهيرو ${idx + 1}`}
+                  fill
+                  sizes="100vw"
+                  priority={isLcpCandidate}
+                  fetchPriority={isLcpCandidate ? "high" : "low"}
+                  {...(!isLcpCandidate ? { loading: "lazy" as const } : {})}
+                  quality={isLcpCandidate ? 72 : 65}
+                  className={`${visibility} hidden sm:block lg:hidden`}
+                />
+                {/* Desktop */}
+                <Image
+                  src={slide.desktop}
+                  alt={`صورة الهيرو ${idx + 1}`}
+                  fill
+                  sizes="100vw"
+                  priority={isLcpCandidate}
+                  fetchPriority={isLcpCandidate ? "high" : "low"}
+                  {...(!isLcpCandidate ? { loading: "lazy" as const } : {})}
+                  quality={isLcpCandidate ? 72 : 65}
+                  className={`${visibility} hidden lg:block`}
+                />
+              </div>
             );
           })}
           {activeHref ? (

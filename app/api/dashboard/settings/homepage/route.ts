@@ -65,11 +65,21 @@ export async function PUT(request: NextRequest) {
     heroFloatImage1?: string | null;
     heroFloatImage2?: string | null;
     heroFloatImage3?: string | null;
-    heroSliderImage1?: string | null;
-    heroSliderImage2?: string | null;
-    heroSliderImage3?: string | null;
-    heroSliderImage4?: string | null;
-    heroSliderImage5?: string | null;
+    heroSliderImage1Desktop?: string | null;
+    heroSliderImage1Tablet?: string | null;
+    heroSliderImage1Mobile?: string | null;
+    heroSliderImage2Desktop?: string | null;
+    heroSliderImage2Tablet?: string | null;
+    heroSliderImage2Mobile?: string | null;
+    heroSliderImage3Desktop?: string | null;
+    heroSliderImage3Tablet?: string | null;
+    heroSliderImage3Mobile?: string | null;
+    heroSliderImage4Desktop?: string | null;
+    heroSliderImage4Tablet?: string | null;
+    heroSliderImage4Mobile?: string | null;
+    heroSliderImage5Desktop?: string | null;
+    heroSliderImage5Tablet?: string | null;
+    heroSliderImage5Mobile?: string | null;
     heroSliderCourseId1?: string | null;
     heroSliderCourseId2?: string | null;
     heroSliderCourseId3?: string | null;
@@ -482,16 +492,36 @@ export async function PUT(request: NextRequest) {
       hero_float_image_1: body.heroFloatImage1 !== undefined ? body.heroFloatImage1 : undefined,
       hero_float_image_2: body.heroFloatImage2 !== undefined ? body.heroFloatImage2 : undefined,
       hero_float_image_3: body.heroFloatImage3 !== undefined ? body.heroFloatImage3 : undefined,
-      hero_slider_image_1:
-        body.heroSliderImage1 !== undefined ? normalizeSliderImage(body.heroSliderImage1) : undefined,
-      hero_slider_image_2:
-        body.heroSliderImage2 !== undefined ? normalizeSliderImage(body.heroSliderImage2) : undefined,
-      hero_slider_image_3:
-        body.heroSliderImage3 !== undefined ? normalizeSliderImage(body.heroSliderImage3) : undefined,
-      hero_slider_image_4:
-        body.heroSliderImage4 !== undefined ? normalizeSliderImage(body.heroSliderImage4) : undefined,
-      hero_slider_image_5:
-        body.heroSliderImage5 !== undefined ? normalizeSliderImage(body.heroSliderImage5) : undefined,
+      hero_slider_image_1_desktop:
+        body.heroSliderImage1Desktop !== undefined ? normalizeSliderImage(body.heroSliderImage1Desktop) : undefined,
+      hero_slider_image_1_tablet:
+        body.heroSliderImage1Tablet !== undefined ? normalizeSliderImage(body.heroSliderImage1Tablet) : undefined,
+      hero_slider_image_1_mobile:
+        body.heroSliderImage1Mobile !== undefined ? normalizeSliderImage(body.heroSliderImage1Mobile) : undefined,
+      hero_slider_image_2_desktop:
+        body.heroSliderImage2Desktop !== undefined ? normalizeSliderImage(body.heroSliderImage2Desktop) : undefined,
+      hero_slider_image_2_tablet:
+        body.heroSliderImage2Tablet !== undefined ? normalizeSliderImage(body.heroSliderImage2Tablet) : undefined,
+      hero_slider_image_2_mobile:
+        body.heroSliderImage2Mobile !== undefined ? normalizeSliderImage(body.heroSliderImage2Mobile) : undefined,
+      hero_slider_image_3_desktop:
+        body.heroSliderImage3Desktop !== undefined ? normalizeSliderImage(body.heroSliderImage3Desktop) : undefined,
+      hero_slider_image_3_tablet:
+        body.heroSliderImage3Tablet !== undefined ? normalizeSliderImage(body.heroSliderImage3Tablet) : undefined,
+      hero_slider_image_3_mobile:
+        body.heroSliderImage3Mobile !== undefined ? normalizeSliderImage(body.heroSliderImage3Mobile) : undefined,
+      hero_slider_image_4_desktop:
+        body.heroSliderImage4Desktop !== undefined ? normalizeSliderImage(body.heroSliderImage4Desktop) : undefined,
+      hero_slider_image_4_tablet:
+        body.heroSliderImage4Tablet !== undefined ? normalizeSliderImage(body.heroSliderImage4Tablet) : undefined,
+      hero_slider_image_4_mobile:
+        body.heroSliderImage4Mobile !== undefined ? normalizeSliderImage(body.heroSliderImage4Mobile) : undefined,
+      hero_slider_image_5_desktop:
+        body.heroSliderImage5Desktop !== undefined ? normalizeSliderImage(body.heroSliderImage5Desktop) : undefined,
+      hero_slider_image_5_tablet:
+        body.heroSliderImage5Tablet !== undefined ? normalizeSliderImage(body.heroSliderImage5Tablet) : undefined,
+      hero_slider_image_5_mobile:
+        body.heroSliderImage5Mobile !== undefined ? normalizeSliderImage(body.heroSliderImage5Mobile) : undefined,
       hero_slider_course_id_1,
       hero_slider_course_id_2,
       hero_slider_course_id_3,
