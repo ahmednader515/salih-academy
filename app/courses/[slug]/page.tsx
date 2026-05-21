@@ -16,6 +16,7 @@ import {
   getLatestPlatformSubscriptionExpiry,
 } from "@/lib/db";
 import { EnrollButton } from "./EnrollButton";
+import { CoursePriceChip } from "@/components/CoursePriceChip";
 import { getLocaleFromCookie, getServerTranslator } from "@/lib/i18n/server";
 import { pickLocalizedText } from "@/lib/i18n/localized-field";
 
@@ -250,11 +251,7 @@ export default async function CoursePage({ params }: Props) {
               {title}
             </h1>
             <div className="mt-4 flex flex-wrap gap-2">
-              {coursePrice > 0 && (
-                <span className="rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-sm font-semibold text-[var(--color-primary)]">
-                  {coursePrice.toFixed(2)} {t("common.egyptianPoundShort", "EGP")}
-                </span>
-              )}
+              {coursePrice > 0 && <CoursePriceChip amountEgp={coursePrice} />}
               {(course as Record<string, unknown>).duration ? (
                 <span className="rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-sm text-[var(--color-primary)]">
                   ⏱ {(course as Record<string, unknown>).duration as string}

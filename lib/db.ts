@@ -1189,6 +1189,66 @@ async function ensureHomepageCopyrightOverlayColumns(): Promise<void> {
   });
 }
 
+/** أسعار صرف العرض (EGP → USD/SAR) — تُحدَّث يومياً */
+async function ensureHomepageExchangeRatesColumns(): Promise<void> {
+  return ensureOnce("ensureHomepageExchangeRatesColumns", async () => {
+    try {
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS exchange_rates_json TEXT`;
+      await sql`ALTER TABLE "HomepageSetting" ADD COLUMN IF NOT EXISTS exchange_rates_fetched_at TIMESTAMPTZ`;
+    } catch {
+      /* DDL غير متاح */
+    }
+  });
+}
+
+export async function getCachedExchangeRates(): Promise<{
+  json: string | null;
+  fetchedAt: Date | null;
+}> {
+  await ensureHomepageExchangeRatesColumns();
+  try {
+    const rows = await sql`
+      SELECT exchange_rates_json, exchange_rates_fetched_at
+      FROM "HomepageSetting"
+      WHERE id = 'default'
+      LIMIT 1
+    `;
+    const row = rows[0] as
+      | { exchange_rates_json?: unknown; exchange_rates_fetched_at?: unknown }
+      | undefined;
+    if (!row) return { json: null, fetchedAt: null };
+    const json =
+      row.exchange_rates_json != null && String(row.exchange_rates_json).trim() !== ""
+        ? String(row.exchange_rates_json)
+        : null;
+    const rawAt = row.exchange_rates_fetched_at;
+    const fetchedAt =
+      rawAt instanceof Date
+        ? rawAt
+        : rawAt != null && String(rawAt).trim() !== ""
+          ? new Date(String(rawAt))
+          : null;
+    return {
+      json,
+      fetchedAt: fetchedAt && !Number.isNaN(fetchedAt.getTime()) ? fetchedAt : null,
+    };
+  } catch {
+    return { json: null, fetchedAt: null };
+  }
+}
+
+export async function saveCachedExchangeRates(json: string, fetchedAt: Date): Promise<void> {
+  await ensureHomepageExchangeRatesColumns();
+  await sql`
+    INSERT INTO "HomepageSetting" (id, exchange_rates_json, exchange_rates_fetched_at, updated_at)
+    VALUES ('default', ${json}, ${fetchedAt.toISOString()}, NOW())
+    ON CONFLICT (id) DO UPDATE SET
+      exchange_rates_json = EXCLUDED.exchange_rates_json,
+      exchange_rates_fetched_at = EXCLUDED.exchange_rates_fetched_at,
+      updated_at = NOW()
+  `;
+}
+
 /** تفعيل عرض «اختر المدرسين» وحسابات المدرسين */
 export async function getTeachersFeatureEnabled(): Promise<boolean> {
   try {

@@ -18,7 +18,11 @@ import {
 import { normalizeHeroHex } from "@/lib/hero-bg";
 import { getDir, makeTranslator } from "@/lib/i18n/core";
 import { getLocaleFromCookie } from "@/lib/i18n/server";
+import { getCurrencyFromCookie } from "@/lib/currency/server";
+import { getExchangeRates } from "@/lib/currency/rates";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { CurrencyProvider } from "@/components/CurrencyProvider";
+import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { homepageDefaultForLocale } from "@/lib/homepage-default-for-locale";
 import { pickLocalizedText } from "@/lib/i18n/localized-field";
 import {
@@ -58,6 +62,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocaleFromCookie();
+  const currency = await getCurrencyFromCookie();
+  const exchangeRates = await getExchangeRates();
   const dir = getDir(locale);
   const t = makeTranslator(locale);
   let platformName: string | null = null;
@@ -153,10 +159,12 @@ export default async function RootLayout({
           shadow="0 0 10px rgba(13,148,136,0.4)"
         />
         <LocaleProvider locale={locale}>
+          <CurrencyProvider currency={currency} rates={exchangeRates}>
           <SessionProvider>
             <StoreSplashProvider>
             <InspectGuard />
             <ForceLogoutGuard />
+            <CurrencyToggle />
             <Header
               platformName={platformName}
               headerLogoUrl={headerLogoUrl}
@@ -166,6 +174,7 @@ export default async function RootLayout({
             <Footer footerTitle={footerTitle} footerTagline={footerTagline} footerCopyright={footerCopyright} />
             </StoreSplashProvider>
           </SessionProvider>
+          </CurrencyProvider>
         </LocaleProvider>
       </body>
     </html>

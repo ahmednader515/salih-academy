@@ -4,15 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LoginBackground from "@/app/login/LoginBackground";
-import { useT } from "@/components/LocaleProvider";
+import { PhoneNumberInput, DEFAULT_PHONE_COUNTRY } from "@/components/PhoneNumberInput";
+import { useLocale, useT } from "@/components/LocaleProvider";
+import { validatePhoneForCountry } from "@/lib/phone/countries";
 
 export default function RegisterPage() {
   const t = useT();
+  const locale = useLocale();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [studentNumber, setStudentNumber] = useState("");
-  const [guardianNumber, setGuardianNumber] = useState("");
+  const [phoneCountry, setPhoneCountry] = useState(DEFAULT_PHONE_COUNTRY);
+  const [phoneNational, setPhoneNational] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -20,9 +23,9 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const digits = studentNumber.replace(/\D/g, "");
-    if (digits.length !== 11) {
-      setError(t("auth.register.phoneMustBe11", "Phone number must be 11 digits"));
+    const phoneCheck = validatePhoneForCountry(phoneCountry, phoneNational);
+    if (!phoneCheck.ok) {
+      setError(locale === "ar" ? phoneCheck.messageAr : phoneCheck.messageEn);
       return;
     }
     setLoading(true);
@@ -33,8 +36,9 @@ export default function RegisterPage() {
         email,
         password,
         name,
-        student_number: studentNumber.trim() || undefined,
-        guardian_number: guardianNumber.trim() || undefined,
+        phone_country: phoneCountry,
+        phone_national: phoneNational,
+        student_number: phoneCheck.stored,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -106,32 +110,13 @@ export default function RegisterPage() {
             >
               {t("auth.register.phoneLabel", "Phone number")}
             </label>
-            <input
+            <PhoneNumberInput
               id="student_number"
-              type="tel"
-              inputMode="numeric"
-              value={studentNumber}
-              onChange={(e) => setStudentNumber(e.target.value)}
+              countryCode={phoneCountry}
+              nationalValue={phoneNational}
+              onCountryChange={setPhoneCountry}
+              onNationalChange={setPhoneNational}
               required
-              className="mt-1 w-full rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-right text-[var(--color-foreground)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-              placeholder="01234567890"
-            />
-            <p className="mt-1 text-right text-xs text-[var(--color-muted)]">01234567890</p>
-          </div>
-          <div>
-            <label
-              htmlFor="guardian_number"
-              className="block text-sm font-medium text-[var(--color-foreground)]"
-            >
-              {t("auth.register.parentPhoneLabel", "Guardian phone number")}
-            </label>
-            <input
-              id="guardian_number"
-              type="text"
-              value={guardianNumber}
-              onChange={(e) => setGuardianNumber(e.target.value)}
-              className="mt-1 w-full rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-[var(--color-foreground)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-              placeholder={t("auth.register.parentPhonePlaceholder", "Guardian phone number")}
             />
           </div>
           <div>

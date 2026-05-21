@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { ProfileForm } from "./ProfileForm";
 import { TeacherPublicProfileForm } from "./TeacherPublicProfileForm";
+import { formatPhoneForDisplay } from "@/lib/phone/format-display";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -41,7 +42,15 @@ export default async function ProfilePage() {
       {isTeacher && (
         <p className="mt-1 text-sm text-[var(--color-muted)]">
           البريد أو رقم الهاتف المسجّل: {user.email}
-          {user.student_number ? ` · هاتف: ${user.student_number}` : ""} (للتعديل تواصل مع الأدمن إن لزم)
+          {user.student_number?.trim() ? (
+            <>
+              {" · هاتف: "}
+              <span dir="ltr" className="tabular-nums">
+                {formatPhoneForDisplay(user.student_number)}
+              </span>
+            </>
+          ) : null}{" "}
+          (للتعديل تواصل مع الأدمن إن لزم)
         </p>
       )}
       <ProfileForm

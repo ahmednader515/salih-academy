@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useCurrency } from "@/components/CurrencyProvider";
 
 export type SubscriptionPlanCardData = {
   id: string;
@@ -58,6 +59,7 @@ export function SubscriptionPlanCard({
   activePlatformSubscriptionExpiresAtIso?: string | null;
 }) {
   const router = useRouter();
+  const { formatPriceParts } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
@@ -129,7 +131,7 @@ export function SubscriptionPlanCard({
     }
   }
 
-  const priceStr = Number(plan.price).toFixed(0);
+  const { amount: priceAmount, code: priceCode } = formatPriceParts(Number(plan.price));
   const loginHref = `/login?callbackUrl=${encodeURIComponent("/")}`;
 
   return (
@@ -269,8 +271,8 @@ export function SubscriptionPlanCard({
             className="flex shrink-0 items-stretch overflow-hidden rounded-lg text-sm font-bold shadow-md ring-1 ring-white/10"
             style={{ backgroundColor: TEAL }}
           >
-            <span className="flex items-center px-2.5 py-2 text-white">ج.م</span>
-            <span className="flex items-center bg-black px-3 py-2 text-white tabular-nums">{priceStr}</span>
+            <span className="flex items-center px-2.5 py-2 text-[10px] font-bold uppercase text-white">{priceCode}</span>
+            <span className="flex items-center bg-black px-3 py-2 text-white tabular-nums">{priceAmount}</span>
           </div>
         </div>
 

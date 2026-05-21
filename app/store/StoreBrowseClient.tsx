@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { FormattedPrice } from "@/components/FormattedPrice";
 import type { StoreProduct } from "@/lib/types";
 
 export function StoreBrowseClient({
@@ -81,7 +82,9 @@ export function StoreBrowseClient({
                       تم الشراء بنجاح
                     </span>
                   ) : (
-                    <span className="text-sm font-semibold text-[var(--color-primary)]">{Number(p.price).toFixed(2)} ج.م</span>
+                    <span className="text-sm font-semibold text-[var(--color-primary)]">
+                      <FormattedPrice amountEgp={Number(p.price)} />
+                    </span>
                   )}
                   {canDownload ? (
                     <a href={p.pdfUrl ?? undefined} target="_blank" rel="noopener noreferrer" className="rounded-[var(--radius-btn)] bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white hover:bg-[var(--color-primary-hover)]">تحميل PDF</a>

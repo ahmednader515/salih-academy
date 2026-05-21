@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AddBalanceButton } from "./AddBalanceButton";
+import { DisplayPhoneNumber } from "@/components/DisplayPhoneNumber";
 import { useT } from "@/components/LocaleProvider";
+import { formatPhoneForDisplay } from "@/lib/phone/format-display";
 import { useDashboardTable } from "@/lib/i18n/dashboard-table";
 
 type Course = { id: string; title: string; titleAr: string | null; slug: string };
@@ -84,7 +86,9 @@ export function StudentsList({
         s.name.toLowerCase().includes(q) ||
         s.email.toLowerCase().includes(q) ||
         (s.student_number ?? "").toLowerCase().includes(q) ||
+        formatPhoneForDisplay(s.student_number).toLowerCase().includes(q) ||
         (s.guardian_number ?? "").toLowerCase().includes(q) ||
+        formatPhoneForDisplay(s.guardian_number).toLowerCase().includes(q) ||
         (s.copyright_code ?? "").toLowerCase().includes(q),
     );
   }, [initialStudents, search]);
@@ -251,8 +255,12 @@ export function StudentsList({
               <tr key={s.id} className="border-b border-[var(--color-border)] last:border-0">
                 <td className="p-3 font-medium text-[var(--color-foreground)]">{s.name}</td>
                 <td className="p-3 text-[var(--color-muted)]">{s.email}</td>
-                <td className="p-3 text-[var(--color-foreground)]">{s.student_number ?? dash}</td>
-                <td className="p-3 text-[var(--color-foreground)]">{s.guardian_number ?? dash}</td>
+                <td className="p-3 text-[var(--color-foreground)]">
+                  <DisplayPhoneNumber value={s.student_number} fallback={dash} />
+                </td>
+                <td className="p-3 text-[var(--color-foreground)]">
+                  <DisplayPhoneNumber value={s.guardian_number} fallback={dash} />
+                </td>
                 <td className="p-3 font-mono text-sm text-[var(--color-foreground)]">
                   {s.copyright_code ?? dash}
                 </td>

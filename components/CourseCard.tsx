@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FormattedPrice } from "./FormattedPrice";
 import { useLocale, useT } from "./LocaleProvider";
 
 function normalizeCoursePrice(
@@ -51,9 +52,7 @@ export function CourseCard({ course }: { course: Course }) {
     courseRatingValue > 0 &&
     courseRatingCountValue !== null &&
     courseRatingCountValue > 0;
-  const priceDisplay =
-    priceValue !== null && priceValue > 0 ? priceValue.toFixed(2) : null;
-  const isPaid = priceDisplay !== null;
+  const isPaid = priceValue !== null && priceValue > 0;
 
   return (
     <Link
@@ -88,18 +87,8 @@ export function CourseCard({ course }: { course: Course }) {
         {/* السعر أولًا في DOM ليظهر على يمين الصف في RTL */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <div className="shrink-0">
-            {isPaid ? (
-              <span
-                className="inline-flex items-stretch overflow-hidden rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)]"
-                dir="ltr"
-              >
-                <span className="flex items-center px-2.5 py-2 text-sm font-semibold tabular-nums text-[var(--color-foreground)]">
-                  {priceDisplay}
-                </span>
-                <span className="flex items-center border-s border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-primary)_14%,var(--color-surface))] px-2 py-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
-                  {t("common.egyptianPoundShort", "EGP")}
-                </span>
-              </span>
+            {isPaid && priceValue !== null ? (
+              <FormattedPrice amountEgp={priceValue} variant="badge" />
             ) : (
               <span className="inline-flex items-center rounded-[var(--radius-btn)] border border-[var(--color-success)]/35 bg-[color-mix(in_srgb,var(--color-success)_12%,var(--color-surface))] px-2.5 py-2 text-xs font-semibold text-[var(--color-success)]">
                 {t("common.free", "Free")}

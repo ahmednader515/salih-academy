@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useLocale, useT } from "@/components/LocaleProvider";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { FormattedPrice } from "@/components/FormattedPrice";
+import { useT } from "@/components/LocaleProvider";
+
+function fillTemplate(template: string, vars: Record<string, string>): string {
+  return Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, v), template);
+}
 
 export function EnrollButton({
   courseId,
@@ -20,17 +26,18 @@ export function EnrollButton({
   const [codeLoading, setCodeLoading] = useState(false);
   const [codeMessage, setCodeMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
-  const locale = useLocale();
   const t = useT();
+  const { formatPrice } = useCurrency();
 
   const hasEnoughBalance = coursePrice === 0 || userBalance >= coursePrice;
 
   async function handleClick() {
     if (!hasEnoughBalance) {
       setError(
-        locale === "ar"
-          ? `رصيدك غير كافٍ. سعر الدورة: ${coursePrice.toFixed(2)} ج.م، رصيدك: ${userBalance.toFixed(2)} ج.م`
-          : `Insufficient balance. Course price: ${coursePrice.toFixed(2)} EGP, your balance: ${userBalance.toFixed(2)} EGP`,
+        fillTemplate(t("currency.insufficientBalance", "Insufficient balance. Course price: {coursePrice}, your balance: {balance}"), {
+          coursePrice: formatPrice(coursePrice),
+          balance: formatPrice(userBalance),
+        }),
       );
       return;
     }
@@ -42,12 +49,7 @@ export function EnrollButton({
     setLoading(false);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError(
-        data.error ??
-          (locale === "ar"
-            ? t("courses.enrollFailed", "فشل التسجيل في الدورة")
-            : t("courses.enrollFailed", "Failed to enroll in course")),
-      );
+      setError(data.error ?? t("courses.enrollFailed", "Failed to enroll in course"));
       return;
     }
     router.refresh();
@@ -59,10 +61,7 @@ export function EnrollButton({
     if (!trimmed) {
       setCodeMessage({
         type: "error",
-        text:
-          locale === "ar"
-            ? t("codes.enterActivationCode", "أدخل كود التفعيل")
-            : t("codes.enterActivationCode", "Enter the activation code"),
+        text: t("codes.enterActivationCode", "Enter the activation code"),
       });
       return;
     }
@@ -78,31 +77,20 @@ export function EnrollButton({
       if (!res.ok) {
         setCodeMessage({
           type: "error",
-          text:
-            data.error ??
-            (locale === "ar"
-              ? t("codes.activationFailed", "فشل تفعيل الكود")
-              : t("codes.activationFailed", "Code activation failed")),
+          text: data.error ?? t("codes.activationFailed", "Code activation failed"),
         });
         return;
       }
       setCodeMessage({
         type: "success",
-        text:
-          data.message ??
-          (locale === "ar"
-            ? t("codes.activationSuccess", "تم تفعيل الكود بنجاح")
-            : t("codes.activationSuccess", "Code activated successfully")),
+        text: data.message ?? t("codes.activationSuccess", "Code activated successfully"),
       });
       setCode("");
       router.refresh();
     } catch {
       setCodeMessage({
         type: "error",
-        text:
-          locale === "ar"
-            ? t("codes.activationErrorGeneric", "حدث خطأ أثناء التفعيل")
-            : t("codes.activationErrorGeneric", "An error occurred during activation"),
+        text: t("codes.activationErrorGeneric", "An error occurred during activation"),
       });
     } finally {
       setCodeLoading(false);
@@ -115,29 +103,30 @@ export function EnrollButton({
         <div className="mb-4 rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-background)] p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-[var(--color-muted)]">
-              {locale === "ar" ? t("courses.priceLabel", "سعر الدورة:") : t("courses.priceLabel", "Course price:")}
+              {t("courses.priceLabel", "Course price:")}
             </span>
             <span className="text-lg font-semibold text-[var(--color-foreground)]">
-              {coursePrice.toFixed(2)} {locale === "ar" ? t("common.egpShortAr", "ج.م") : t("common.egyptianPoundShort", "EGP")}
+              <FormattedPrice amountEgp={coursePrice} />
             </span>
           </div>
           <div className="mt-2 flex items-center justify-between">
             <span className="text-sm text-[var(--color-muted)]">
-              {locale === "ar"
-                ? t("wallet.currentBalanceLabel", "رصيدك الحالي:")
-                : t("wallet.currentBalanceLabel", "Your balance:")}
+              {t("wallet.currentBalanceLabel", "Your balance:")}
             </span>
             <span className={`text-lg font-semibold ${hasEnoughBalance ? "text-[var(--color-success)]" : "text-red-600"}`}>
-              {userBalance.toFixed(2)} {locale === "ar" ? t("common.egpShortAr", "ج.م") : t("common.egyptianPoundShort", "EGP")}
+              <FormattedPrice amountEgp={userBalance} />
             </span>
           </div>
+          <p className="mt-2 text-xs text-[var(--color-muted)]">
+            {t("currency.chargedInEgpNote", "Charges are deducted from your balance in EGP.")}
+          </p>
           {!hasEnoughBalance && (
             <p className="mt-2 text-sm text-red-600">
-              {locale === "ar"
-                ? `تحتاج ${((coursePrice - userBalance).toFixed(2))} ج.م إضافية. `
-                : `You need an additional ${((coursePrice - userBalance).toFixed(2))} EGP. `}
+              {fillTemplate(t("currency.needAdditional", "You need an additional {amount}."), {
+                amount: formatPrice(coursePrice - userBalance),
+              })}{" "}
               <Link href="/dashboard" className="font-medium underline">
-                {locale === "ar" ? t("wallet.topUp", "شحن الرصيد") : t("wallet.topUp", "Top up balance")}
+                {t("wallet.topUp", "Top up balance")}
               </Link>
             </p>
           )}
@@ -146,20 +135,14 @@ export function EnrollButton({
 
       <div className="mb-4 rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-background)]/50 p-4">
         <p className="mb-3 text-sm font-medium text-[var(--color-foreground)]">
-          {locale === "ar"
-            ? t("codes.haveActivationCode", "لديك كود تفعيل؟")
-            : t("codes.haveActivationCode", "Have an activation code?")}
+          {t("codes.haveActivationCode", "Have an activation code?")}
         </p>
         <form onSubmit={handleActivateCode} className="flex flex-wrap items-center gap-2">
           <input
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder={
-              locale === "ar"
-                ? t("codes.activationCodePlaceholder", "أدخل كود التفعيل")
-                : t("codes.activationCodePlaceholder", "Enter activation code")
-            }
+            placeholder={t("codes.activationCodePlaceholder", "Enter activation code")}
             className="min-w-[160px] flex-1 rounded-[var(--radius-btn)] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm font-mono placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
             disabled={codeLoading}
           />
@@ -168,13 +151,7 @@ export function EnrollButton({
             disabled={codeLoading}
             className="rounded-[var(--radius-btn)] border border-[var(--color-primary)] bg-[var(--color-primary)]/10 px-4 py-2 text-sm font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 disabled:opacity-50"
           >
-            {codeLoading
-              ? (locale === "ar"
-                  ? t("codes.activating", "جاري التفعيل...")
-                  : t("codes.activating", "Activating..."))
-              : (locale === "ar"
-                  ? t("codes.activate", "تفعيل الكود")
-                  : t("codes.activate", "Activate code"))}
+            {codeLoading ? t("codes.activating", "Activating...") : t("codes.activate", "Activate code")}
           </button>
         </form>
         {codeMessage && (
@@ -196,16 +173,12 @@ export function EnrollButton({
         className="w-full rounded-[var(--radius-btn)] bg-[var(--color-primary)] px-6 py-3 font-medium text-white hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading
-          ? (locale === "ar"
-              ? t("courses.enrolling", "جاري التسجيل...")
-              : t("courses.enrolling", "Enrolling..."))
+          ? t("courses.enrolling", "Enrolling...")
           : coursePrice > 0
-          ? (locale === "ar"
-              ? `شراء الدورة (${coursePrice.toFixed(2)} ج.م)`
-              : `Buy course (${coursePrice.toFixed(2)} EGP)`)
-          : (locale === "ar"
-              ? t("courses.enrollFree", "التسجيل في الدورة (مجاناً)")
-              : t("courses.enrollFree", "Enroll (Free)"))}
+            ? fillTemplate(t("currency.buyCourse", "Buy course ({price})"), {
+                price: formatPrice(coursePrice),
+              })
+            : t("courses.enrollFree", "Enroll (Free)")}
       </button>
     </div>
   );

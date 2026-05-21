@@ -20,6 +20,7 @@ import { getServerTranslator } from "@/lib/i18n/server";
 import { MyCoursesSection } from "./MyCoursesSection";
 import { ActivateCodeSection } from "./ActivateCodeSection";
 import { StudentSubscriptionsPanel } from "./StudentSubscriptionsPanel";
+import { DashboardStudentBalance } from "@/components/DashboardStudentBalance";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -177,14 +178,7 @@ export default async function DashboardPage() {
               {t("dashboard.page.greetingComma", "Welcome,")} {session.user.name}
             </h2>
             <div className="mt-4 flex flex-wrap items-center gap-4">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[var(--color-muted)]">
-                  {t("dashboard.page.currentBalanceLabel", "Your balance:")}
-                </span>
-                <span className="text-2xl font-bold text-[var(--color-primary)]">
-                  {Number(balance).toFixed(2)} {t("common.egyptianPoundShort", "EGP")}
-                </span>
-              </div>
+              <DashboardStudentBalance balanceEgp={Number(balance)} />
               <Link
                 href="/dashboard/add-balance"
                 className="rounded-[var(--radius-btn)] bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)]"
