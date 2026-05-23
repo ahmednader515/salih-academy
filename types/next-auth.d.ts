@@ -1,3 +1,4 @@
+import type { DisplayCurrency } from "@/lib/currency/constants";
 import type { UserRole } from "@/lib/types";
 
 declare module "next-auth" {
@@ -5,12 +6,14 @@ declare module "next-auth" {
     id?: string;
     role?: UserRole;
     sessionId?: string;
+    displayCurrency?: DisplayCurrency;
   }
 
   interface Session {
     user: User & {
       id: string;
       role: UserRole;
+      displayCurrency?: DisplayCurrency;
     };
     forceLogout?: boolean;
   }
@@ -21,5 +24,6 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: UserRole;
     sessionId?: string;
+    displayCurrency?: DisplayCurrency;
   }
 }

@@ -50,6 +50,8 @@ export const enMessages: Messages = {
     SAR: "Saudi riyal",
     USD: "US dollar",
     chargedInEgpNote: "Charges are deducted from your balance in EGP.",
+    accountPermanentNote:
+      "This currency will be used for all prices on your account and cannot be changed later.",
     rateUpdated: "Rates updated",
     needAdditional: "You need an additional {amount}.",
     buyCourse: "Buy course ({price})",

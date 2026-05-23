@@ -20,6 +20,8 @@ export interface User {
   teacher_homepage_order?: number | null;
   /** كود حقوق الطبع والنشر — للطلاب فقط، فريد، يظهر على مشغّل الحصص */
   copyright_code?: string | null;
+  /** EGP | SAR | USD — display-only prices for this account */
+  display_currency?: string | null;
   current_session_id?: string | null;
   created_at: Date;
   updated_at: Date;

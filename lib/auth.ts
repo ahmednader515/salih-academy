@@ -3,6 +3,7 @@ import { decode as defaultJwtDecode } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { randomUUID } from "crypto";
+import { normalizeCurrency, type DisplayCurrency } from "@/lib/currency/constants";
 import { getUserByEmailOrPhone, getCurrentSessionId, setCurrentSessionId } from "@/lib/db";
 import type { UserRole } from "@/lib/types";
 import { CONCURRENT_SESSION_ERROR } from "@/lib/auth-constants";
@@ -55,6 +56,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           image: null,
           sessionId,
+          displayCurrency: normalizeCurrency(user.display_currency ?? undefined),
         };
       },
     }),
@@ -65,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = (user as { role?: UserRole }).role;
         token.sessionId = (user as { sessionId?: string }).sessionId;
+        token.displayCurrency = (user as { displayCurrency?: DisplayCurrency }).displayCurrency;
       }
       return token;
     },
@@ -72,6 +75,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as { id?: string }).id = token.id as string;
         (session.user as { role?: UserRole }).role = token.role as UserRole;
+        (session.user as { displayCurrency?: DisplayCurrency }).displayCurrency =
+          token.displayCurrency as DisplayCurrency | undefined;
         const { getCurrentSessionId: getSessionId } = await import("@/lib/db");
         const dbSessionId = await getSessionId((session.user as { id: string }).id);
         const sessionMismatch = !dbSessionId || dbSessionId.trim() === "" || dbSessionId !== token.sessionId;

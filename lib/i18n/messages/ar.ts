@@ -50,6 +50,7 @@ export const arMessages: Messages = {
     SAR: "ريال سعودي",
     USD: "دولار أمريكي",
     chargedInEgpNote: "يتم الخصم من رصيدك بالجنيه المصري (ج.م).",
+    accountPermanentNote: "ستُستخدم هذه العملة لعرض جميع الأسعار في حسابك ولا يمكن تغييرها لاحقاً.",
     rateUpdated: "آخر تحديث للأسعار",
     needAdditional: "تحتاج {amount} إضافية.",
     buyCourse: "شراء الدورة ({price})",

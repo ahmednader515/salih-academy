@@ -18,11 +18,10 @@ import {
 import { normalizeHeroHex } from "@/lib/hero-bg";
 import { getDir, makeTranslator } from "@/lib/i18n/core";
 import { getLocaleFromCookie } from "@/lib/i18n/server";
-import { getCurrencyFromCookie } from "@/lib/currency/server";
+import { getCurrencyForRequest } from "@/lib/currency/server";
 import { getExchangeRates } from "@/lib/currency/rates";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
-import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { homepageDefaultForLocale } from "@/lib/homepage-default-for-locale";
 import { pickLocalizedText } from "@/lib/i18n/localized-field";
 import {
@@ -62,7 +61,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocaleFromCookie();
-  const currency = await getCurrencyFromCookie();
+  const session = await getServerSession(authOptions);
+  const currency = getCurrencyForRequest(session);
   const exchangeRates = await getExchangeRates();
   const dir = getDir(locale);
   const t = makeTranslator(locale);
@@ -110,7 +110,6 @@ export default async function RootLayout({
 
   let platformSubscriptionExpiryLabel: string | null = null;
   try {
-    const session = await getServerSession(authOptions);
     if (session?.user?.role === "STUDENT" && session.user.id) {
       const active = await userHasActivePlatformSubscription(session.user.id);
       if (active) {
@@ -164,7 +163,6 @@ export default async function RootLayout({
             <StoreSplashProvider>
             <InspectGuard />
             <ForceLogoutGuard />
-            <CurrencyToggle />
             <Header
               platformName={platformName}
               headerLogoUrl={headerLogoUrl}

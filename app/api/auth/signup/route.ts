@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
+import { normalizeCurrency, SUPPORTED_CURRENCIES } from "@/lib/currency/constants";
 import { getUserByEmail, createUser } from "@/lib/db";
 import { validatePhoneForCountry } from "@/lib/phone/countries";
 import { z } from "zod";
@@ -11,6 +12,9 @@ const signupSchema = z.object({
   phone_country: z.string().min(2, "كود الدولة مطلوب"),
   phone_national: z.string().min(1, "رقم الهاتف مطلوب"),
   student_number: z.string().optional(),
+  display_currency: z
+    .string()
+    .refine((v) => SUPPORTED_CURRENCIES.includes(normalizeCurrency(v)), "عملة غير مدعومة"),
 });
 
 export async function POST(request: NextRequest) {
@@ -23,7 +27,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const { email, password, name, phone_country, phone_national, student_number } = parsed.data;
+    const { email, password, name, phone_country, phone_national, student_number, display_currency } =
+      parsed.data;
 
     const phoneCheck = validatePhoneForCountry(phone_country, phone_national);
     if (!phoneCheck.ok) {
@@ -49,6 +54,7 @@ export async function POST(request: NextRequest) {
       role: "STUDENT",
       student_number: phoneCheck.stored,
       guardian_number: null,
+      display_currency: normalizeCurrency(display_currency),
     });
 
     return NextResponse.json({ success: true });

@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LoginBackground from "@/app/login/LoginBackground";
+import { CurrencySelectField } from "@/components/CurrencySelectField";
 import { PhoneNumberInput, DEFAULT_PHONE_COUNTRY } from "@/components/PhoneNumberInput";
 import { useLocale, useT } from "@/components/LocaleProvider";
+import { DEFAULT_CURRENCY, type DisplayCurrency } from "@/lib/currency/constants";
 import { validatePhoneForCountry } from "@/lib/phone/countries";
 
 export default function RegisterPage() {
@@ -16,6 +18,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [phoneCountry, setPhoneCountry] = useState(DEFAULT_PHONE_COUNTRY);
   const [phoneNational, setPhoneNational] = useState("");
+  const [displayCurrency, setDisplayCurrency] = useState<DisplayCurrency>(DEFAULT_CURRENCY);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -39,6 +42,7 @@ export default function RegisterPage() {
         phone_country: phoneCountry,
         phone_national: phoneNational,
         student_number: phoneCheck.stored,
+        display_currency: displayCurrency,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -118,6 +122,12 @@ export default function RegisterPage() {
               onNationalChange={setPhoneNational}
               required
             />
+          </div>
+          <div>
+            <span className="block text-sm font-medium text-[var(--color-foreground)]">
+              {t("currency.selectLabel", "Currency")}
+            </span>
+            <CurrencySelectField value={displayCurrency} onChange={setDisplayCurrency} />
           </div>
           <div>
             <label

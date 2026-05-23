@@ -1,5 +1,3 @@
-export const CURRENCY_COOKIE_NAME = "site_currency";
-
 export type DisplayCurrency = "EGP" | "SAR" | "USD";
 
 export const SUPPORTED_CURRENCIES: DisplayCurrency[] = ["EGP", "SAR", "USD"];

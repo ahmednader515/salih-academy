@@ -521,14 +521,3 @@ html:not(.light):not(.dark) .home-teachers-hero-blend {
     opacity: 0;
   }
 }
-
-/* Floating currency switcher (left edge) */
-.currency-floating-toggle {
-  left: max(0.75rem, env(safe-area-inset-left, 0px)) !important;
-}
-
-html.light .currency-floating-toggle > div {
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.2),
-    0 0 20px color-mix(in srgb, var(--color-primary) 25%, transparent);
-}

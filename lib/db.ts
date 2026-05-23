@@ -268,6 +268,17 @@ export async function ensureTeacherHomepageOrderColumn(): Promise<void> {
 }
 
 /** عمود كود حقوق الطبع والنشر (فريد لكل طالب) */
+/** عملة عرض الأسعار للحساب (EGP | SAR | USD) */
+export async function ensureUserDisplayCurrencyColumn(): Promise<void> {
+  return ensureOnce("ensureUserDisplayCurrencyColumn", async () => {
+    try {
+      await sql`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS display_currency TEXT`;
+    } catch {
+      /* */
+    }
+  });
+}
+
 export async function ensureCopyrightCodeColumn(): Promise<void> {
   return ensureOnce("ensureCopyrightCodeColumn", async () => {
     try {
@@ -340,6 +351,7 @@ export async function createUser(data: {
   guardian_number?: string | null;
   teacher_subject?: string | null;
   teacher_avatar_url?: string | null;
+  display_currency?: string | null;
 }): Promise<User> {
   const id = generateId();
   let usedFallbackInsertWithoutTeacherCols = false;
@@ -347,12 +359,14 @@ export async function createUser(data: {
     await ensureTeacherAccountDbSchema();
   }
   await ensureCopyrightCodeColumn().catch(() => {});
+  await ensureUserDisplayCurrencyColumn().catch(() => {});
+  const displayCurrency = data.display_currency?.trim() || "EGP";
   const studentCopyright =
     (data.role ?? "STUDENT") === "STUDENT" ? await allocateUniqueCopyrightCode() : null;
   try {
     await sql`
-      INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, teacher_subject, teacher_avatar_url, copyright_code)
-      VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${data.teacher_subject ?? null}, ${data.teacher_avatar_url ?? null}, ${studentCopyright})
+      INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, teacher_subject, teacher_avatar_url, copyright_code, display_currency)
+      VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${data.teacher_subject ?? null}, ${data.teacher_avatar_url ?? null}, ${studentCopyright}, ${displayCurrency})
     `;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -362,9 +376,26 @@ export async function createUser(data: {
       (msg.includes("column") && msg.includes("does not exist") && msg.includes("teacher"));
     if (missingTeacherCols) {
       usedFallbackInsertWithoutTeacherCols = true;
+      try {
+        await sql`
+          INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, copyright_code, display_currency)
+          VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${studentCopyright}, ${displayCurrency})
+        `;
+      } catch (e2) {
+        const msg2 = e2 instanceof Error ? e2.message : String(e2);
+        if (msg2.includes("display_currency")) {
+          await sql`
+            INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, copyright_code)
+            VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${studentCopyright})
+          `;
+        } else {
+          throw e2;
+        }
+      }
+    } else if (msg.includes("display_currency")) {
       await sql`
-        INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, copyright_code)
-        VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${studentCopyright})
+        INSERT INTO "User" (id, email, password_hash, name, role, student_number, guardian_number, teacher_subject, teacher_avatar_url, copyright_code)
+        VALUES (${id}, ${data.email}, ${data.password_hash}, ${data.name}, ${data.role ?? "STUDENT"}, ${data.student_number ?? null}, ${data.guardian_number ?? null}, ${data.teacher_subject ?? null}, ${data.teacher_avatar_url ?? null}, ${studentCopyright})
       `;
     } else {
       throw e;

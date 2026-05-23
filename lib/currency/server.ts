@@ -1,9 +1,11 @@
-import { cookies } from "next/headers";
-import { CURRENCY_COOKIE_NAME, DEFAULT_CURRENCY, normalizeCurrency } from "./constants";
-import type { DisplayCurrency } from "./constants";
+import type { Session } from "next-auth";
+import { DEFAULT_CURRENCY, normalizeCurrency, type DisplayCurrency } from "./constants";
 
-export async function getCurrencyFromCookie(): Promise<DisplayCurrency> {
-  const cookieStore = await cookies();
-  const cookieValue = cookieStore.get(CURRENCY_COOKIE_NAME)?.value;
-  return normalizeCurrency(cookieValue ?? DEFAULT_CURRENCY);
+/** Currency for price display: account preference when logged in, else EGP (guests / legacy). */
+export function getCurrencyForRequest(session: Session | null): DisplayCurrency {
+  const raw = (session?.user as { displayCurrency?: string | null } | undefined)?.displayCurrency;
+  if (raw?.trim()) {
+    return normalizeCurrency(raw);
+  }
+  return DEFAULT_CURRENCY;
 }
