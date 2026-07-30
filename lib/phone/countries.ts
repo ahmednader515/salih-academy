@@ -94,6 +94,15 @@ export const PHONE_COUNTRIES: PhoneCountry[] = [
     nameAr: "الأردن",
     flag: "🇯🇴",
   },
+  {
+    code: "SD",
+    dial: "249",
+    nationalLength: 9,
+    placeholder: "912345678",
+    nameEn: "Sudan",
+    nameAr: "السودان",
+    flag: "🇸🇩",
+  },
 ];
 
 export const DEFAULT_PHONE_COUNTRY = "EG";
